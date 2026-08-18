@@ -24,7 +24,7 @@ pipeline {
     post {
         always {
             publishHTML([
-                allowMissing: true,
+                allowMissing: false,
                 alwaysLinkToLastBuild: true,
                 keepAll: true,
                 reportDir: 'playwright-web/playwright-report',
