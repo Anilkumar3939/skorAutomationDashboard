@@ -20,4 +20,17 @@ pipeline {
             }
         }
     }
+
+    post {
+        always {
+            publishHTML([
+                allowMissing: true,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: 'playwright-web/playwright-report',
+                reportFiles: 'index.html',
+                reportName: 'Playwright HTML Report'
+            ])
+        }
+    }
 }
