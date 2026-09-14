@@ -1,36 +1,73 @@
 pipeline {
+
     agent any
 
     stages {
 
-        stage('Install Playwright') {
+        stage('Checkout') {
             steps {
-                dir('playwright-web') {
-                    bat 'npm ci'
-                    bat 'npx playwright install'
-                }
+                checkout scm
+            }
+        }
+
+        stage('Install Frontend Dependencies') {
+            steps {
+                bat '''
+                    cd skor-dashboard
+                    npm ci
+                '''
+            }
+        }
+
+        stage('Install Playwright Dependencies') {
+            steps {
+                bat '''
+                    cd playwright-web
+                    npm ci
+                    npx playwright install
+                '''
+            }
+        }
+
+        stage('Start Backend') {
+            steps {
+                bat '''
+                    cd skor-dashboard
+                    start "Backend" /B cmd /c "npm run server > server.log 2>&1"
+                '''
+            }
+        }
+
+        stage('Start Frontend') {
+            steps {
+                bat '''
+                    cd skor-dashboard
+                    start "Frontend" /B cmd /c "npm run dev > frontend.log 2>&1"
+                '''
             }
         }
 
         stage('Run Playwright Tests') {
             steps {
-                dir('playwright-web') {
-                    bat 'npx playwright test'
-                }
+                bat '''
+                    cd playwright-web
+                    npm test
+                '''
             }
         }
     }
 
     post {
         always {
-            publishHTML([
-                allowMissing: false,
-                alwaysLinkToLastBuild: true,
-                keepAll: true,
-                reportDir: 'playwright-web/playwright-report',
-                reportFiles: 'index.html',
-                reportName: 'Playwright HTML Report'
-            ])
+            echo 'Playwright execution completed'
+        }
+
+        success {
+            echo 'All tests passed'
+        }
+
+        failure {
+            echo 'Some tests failed'
         }
     }
 }
