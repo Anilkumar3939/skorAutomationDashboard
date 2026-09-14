@@ -3,5 +3,5 @@ import { test, expect } from '@playwright/test';
 test('Dashboard loads successfully', async ({ page }) => {
     await page.goto('/');
 
-    await expect(page).toHaveTitle(/Skorr/i);
+    await expect(page).toHaveTitle("SKOR Testing Dashboard");
 });
